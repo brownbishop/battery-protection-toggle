@@ -10,17 +10,18 @@ const LOCATION = "/sys/bus/platform/drivers/ideapad_acpi/VPC2004:00/conservation
 
 func usage() {
 	message := `usage: battery-protection-toggle [operation]
-    operations:
-        -h  Display this message.
-        -s  Display battery protection status.
-        -e  Enable battery protection.
-        -d  Disable battery protection.
-    `
+operations:
+    -h  Display this message.
+    -s  Display battery protection status.
+    -e  Enable battery protection.
+    -d  Disable battery protection.
+`
 	fmt.Printf(message)
 }
 
 func status() {
 	file, err := os.Open(LOCATION)
+	defer file.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
