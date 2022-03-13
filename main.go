@@ -11,10 +11,10 @@ const LOCATION = "/sys/bus/platform/drivers/ideapad_acpi/VPC2004:00/conservation
 func usage() {
 	message := `usage: battery-protection-toggle [operation]
 operations:
-    -h  Display this message.
-    -s  Display battery protection status.
-    -e  Enable battery protection.
-    -d  Disable battery protection.
+    help  Display this message.
+    status  Display battery protection status.
+    on  Enable battery protection.
+    off  Disable battery protection.
 `
 	fmt.Printf(message)
 }
@@ -58,13 +58,13 @@ func main() {
 	}
 
 	switch os.Args[1] {
-	case "-s":
+	case "status":
 		status()
-	case "-e":
+	case "on":
 		enable_protection()
-	case "-d":
+	case "off":
 		disable_protection()
-	case "-h":
+	case "help":
 		usage()
 	default:
 		log.Print("unknown option")
