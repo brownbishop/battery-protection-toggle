@@ -67,6 +67,6 @@ func main() {
 	case "help":
 		usage()
 	default:
-		log.Print("unknown option")
+        fmt.Fprintln(os.Stderr, "unknown option")
 	}
 }
