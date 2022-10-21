@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -8,18 +9,7 @@ import (
 
 const LOCATION = "/sys/bus/platform/drivers/ideapad_acpi/VPC2004:00/conservation_mode"
 
-func usage() {
-	message := `usage: battery-protection-toggle [operation]
-operations:
-    help  Display this message.
-    status  Display battery protection status.
-    on  Enable battery protection.
-    off  Disable battery protection.
-`
-	fmt.Printf(message)
-}
-
-func status() {
+func displayStatus() {
 	file, err := os.Open(LOCATION)
 	defer file.Close()
 	if err != nil {
@@ -37,14 +27,14 @@ func status() {
 	}
 }
 
-func enable_protection() {
+func enableProtection() {
 	err := os.WriteFile(LOCATION, []byte("1"), 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func disable_protection() {
+func disableProtection() {
 	err := os.WriteFile(LOCATION, []byte("0"), 0644)
 	if err != nil {
 		log.Fatal(err)
@@ -52,21 +42,22 @@ func disable_protection() {
 }
 
 func main() {
-	if len(os.Args) != 2 {
-		usage()
-		os.Exit(0)
-	}
+    status := flag.Bool("status", false, "battery protection status")
+    on := flag.Bool("on", false, "turn on battery protection")
+    off := flag.Bool("off", false, "turn off battery protection")
+    help := flag.Bool("help", false, "display help message")
 
-	switch os.Args[1] {
-	case "status":
-		status()
-	case "on":
-		enable_protection()
-	case "off":
-		disable_protection()
-	case "help":
-		usage()
+	switch {
+	case *status == true:
+		displayStatus()
+	case *on == true:
+		enableProtection()
+	case *off == true:
+		disableProtection()
+    case *help == true:
+        flag.Usage()
 	default:
-        fmt.Fprintln(os.Stderr, "unknown option")
+        flag.Usage()
+        os.Exit(1)
 	}
 }
