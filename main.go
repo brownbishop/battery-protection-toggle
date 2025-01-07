@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
+	"strings"
 )
 
 const LOCATION = "/sys/bus/platform/drivers/ideapad_acpi/VPC2004:00/conservation_mode"
@@ -30,23 +32,45 @@ func displayStatus() {
 func enableProtection() {
 	err := os.WriteFile(LOCATION, []byte("1"), 0644)
 	if err != nil {
-		log.Fatal(err)
+		if strings.Contains(err.Error(), "permission denied") {
+			runAsRoot("-on")
+		} else {
+			log.Fatal(err)
+		}
 	}
 }
 
 func disableProtection() {
 	err := os.WriteFile(LOCATION, []byte("0"), 0644)
 	if err != nil {
+		if strings.Contains(err.Error(), "permission denied") {
+			runAsRoot("-off")
+		} else {
+			log.Fatal(err)
+		}
+	}
+}
+
+func runAsRoot(arg string) {
+	fmt.Println("This operation requires root privileges, running again with sudo...")
+	exe, err := os.Executable()
+	if err != nil {
+		log.Fatal(err)
+	}
+	cmd := exec.Command("sudo", exe, arg)
+	err = cmd.Run()
+	if err != nil {
 		log.Fatal(err)
 	}
 }
 
 func main() {
-    status := flag.Bool("status", false, "battery protection status")
-    on := flag.Bool("on", false, "turn on battery protection")
-    off := flag.Bool("off", false, "turn off battery protection")
-    help := flag.Bool("help", false, "display help message")
+	status := flag.Bool("status", false, "battery protection status")
+	on := flag.Bool("on", false, "turn on battery protection")
+	off := flag.Bool("off", false, "turn off battery protection")
+	help := flag.Bool("help", false, "display help message")
 
+	flag.Parse()
 	switch {
 	case *status == true:
 		displayStatus()
@@ -54,10 +78,10 @@ func main() {
 		enableProtection()
 	case *off == true:
 		disableProtection()
-    case *help == true:
-        flag.Usage()
+	case *help == true:
+		flag.Usage()
 	default:
-        flag.Usage()
-        os.Exit(1)
+		flag.Usage()
+		os.Exit(1)
 	}
 }
