@@ -71,6 +71,7 @@ func main() {
 	help := flag.Bool("help", false, "display help message")
 
 	flag.Parse()
+
 	switch {
 	case *status == true:
 		displayStatus()
