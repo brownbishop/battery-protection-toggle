@@ -15,10 +15,11 @@ const LOCATION = "/sys/bus/platform/drivers/ideapad_acpi/VPC2004:00/conservation
 
 func displayStatus() error {
 	file, err := os.Open(LOCATION)
-	defer file.Close()
 	if err != nil {
 		return err
 	}
+	defer file.Close()
+
 
 	var status int
 	_, err = fmt.Fscanf(file, "%d", &status)
